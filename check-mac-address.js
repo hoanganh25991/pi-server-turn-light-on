@@ -7,50 +7,95 @@ var exec = require('child_process').exec;
 
 
 function puts(error, stdout, stderr) {
-    // sys.puts(stdout);
-    // console.log(stdout.substring(0, 50));
-    console.log(stdout);
+	// sys.puts(stdout);
+	// console.log(stdout.substring(0, 50));
+	console.log(stdout);
 
-    var isDellOn = stdout.includes(dellMacAdd);
+	var isDellOn = stdout.includes(dellMacAdd);
 
-    var msg = isDellOn ? 'dellMacAdd is on' : 'can not find dellMacAdd';
+	var msg = isDellOn ? 'dellMacAdd is on' : 'can not find dellMacAdd';
 
-    var http = require("http");
+	var http = require("http");
 
-    var req;
+	var req;
 
 
-    if (isDellOn) {
-    	console.log(msg);
-    	//get status on|off
+	if (isDellOn) {
+		console.log(msg);
+		//get status on|off
+		
 
-        var options = {
-            "method": "GET",
-            "hostname": "192.168.1.98",
-            "port": "9876",
-            "path": "/status?deviceMac=b4%3A43%3A0d%3Ab0%3A8a%3A2b",
-            "headers": {
-                "cache-control": "no-cache",
-                "postman-token": "4144a658-5a02-70d1-6771-2d259408834c"
-            }
-        };
+		var request = require("request");
 
-        req = http.request(options, function(res) {
-            var chunks = [];
+		var turnOnOff = false;
 
-            res.on("data", function(chunk) {
-                chunks.push(chunk);
-            });
+		var timestamp = new Date().getTime() / 1000;
 
-            res.on("end", function() {
-                var body = Buffer.concat(chunks);
-                console.log(body.toString());
-            });
-        });
+		var hours = Math.floor(timestamp / 60 / 60);
 
-        req.end();
-    }
+		var offset = +7;
+
+		var hourInDay = hours % 24 + offset;
+
+		if(hourInDay > 13 & hourInDay < 18){
+			turnOnOff = true;
+		}
+
+		// var options = {
+		// 	method: 'GET',
+		// 	url: 'http://192.168.1.98:9876/status',
+		// 	qs: {
+		// 		deviceMac: 'b4:43:0d:b0:8a:2b'
+		// 	}
+		// };
+
+		// request(options, function(error, response, body) {
+		// 	if (error) throw new Error(error);
+
+		// 	console.log(body);
+
+		// 	var status = JSON.parse(body);
+
+		// 	var timestamp = Number(status.timestamp);
+
+		// 	var hours = Math.floor(timestamp / 60 / 60);
+
+		// 	var offset = +7;
+
+		// 	var hourInDay = hours % 24 + offset;
+
+		// 	if(hourInDay > 13 & hourInDay < 18){
+		// 		turnOnOff = 'on';
+		// 	}
+		// });
+		
+		if(turnOnOff){
+			//send turnOnOff request
+			var options = {
+				method: 'GET',
+				url: 'http://192.168.1.98:9876/send',
+				qs: {
+					deviceMac: 'b4:43:0d:b0:8a:2b',
+					on: true
+				}
+			};
+
+			request(options, function(error, response, body) {
+				if (error) throw new Error(error);
+
+				console.log(body);
+			});
+		}
+		
+	}
 
 }
+
+
+
+var intervalCheck = setInterval(function(){
+
+
+}, 5 * 60 * 1000);
 
 exec("arp -a", puts);
