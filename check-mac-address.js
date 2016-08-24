@@ -2,7 +2,6 @@
 var dellMacAdd = 'e0:9d:31:2a:fd:a0';
 
 //exec cmd from node
-var sys = require('util');
 var exec = require('child_process').exec;
 
 var requestTurnOn = function(rule){
@@ -42,20 +41,11 @@ var requestTurnOn = function(rule){
 
 
 var puts = function (error, stdout, stderr) {
-	// sys.puts(stdout);
-	// console.log(stdout.substring(0, 50));
 	console.log(stdout);
 
 	var isDellOn = stdout.includes(dellMacAdd);
 
 	var msg = isDellOn ? 'dellMacAdd is on' : 'can not find dellMacAdd';
-
-	var http = require("http");
-
-	var req;
-
-	
-
 
 	if (isDellOn) {
 		console.log(msg);
