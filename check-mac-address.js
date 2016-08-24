@@ -24,9 +24,6 @@ function puts(error, stdout, stderr) {
 		console.log(msg);
 		//get status on|off
 		
-
-		var request = require("request");
-
 		var turnOnOff = false;
 
 		var timestamp = new Date().getTime() / 1000;
@@ -41,36 +38,9 @@ function puts(error, stdout, stderr) {
 			turnOnOff = true;
 		}
 
-		// var options = {
-		// 	method: 'GET',
-		// 	url: 'http://192.168.1.98:9876/status',
-		// 	qs: {
-		// 		deviceMac: 'b4:43:0d:b0:8a:2b'
-		// 	}
-		// };
-
-		// request(options, function(error, response, body) {
-		// 	if (error) throw new Error(error);
-
-		// 	console.log(body);
-
-		// 	var status = JSON.parse(body);
-
-		// 	var timestamp = Number(status.timestamp);
-
-		// 	var hours = Math.floor(timestamp / 60 / 60);
-
-		// 	var offset = +7;
-
-		// 	var hourInDay = hours % 24 + offset;
-
-		// 	if(hourInDay > 13 & hourInDay < 18){
-		// 		turnOnOff = 'on';
-		// 	}
-		// });
-		
 		if(turnOnOff){
 			//send turnOnOff request
+			var request = require("request");
 			var options = {
 				method: 'GET',
 				url: 'http://192.168.1.98:9876/send',
@@ -91,11 +61,6 @@ function puts(error, stdout, stderr) {
 
 }
 
-
-
 var intervalCheck = setInterval(function(){
-
-
+	exec("arp -a", puts);
 }, 5 * 60 * 1000);
-
-exec("arp -a", puts);
