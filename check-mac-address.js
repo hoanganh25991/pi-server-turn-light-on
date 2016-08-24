@@ -5,8 +5,43 @@ var dellMacAdd = 'e0:9d:31:2a:fd:a0';
 var sys = require('util');
 var exec = require('child_process').exec;
 
+var requestTurnOn = function(rule){
+	var turnOnOff = false;
 
-function puts(error, stdout, stderr) {
+	var timestamp = new Date().getTime() / 1000;
+
+	var hours = Math.floor(timestamp / 60 / 60);
+
+	var offset = +7;
+
+	var hourInDay = hours % 24 + offset;
+
+	if(hourInDay > rule.timeRange[0] & hourInDay < rule.timeRange[1]){
+		turnOnOff = true;
+	}
+
+	if(turnOnOff){
+		//send turnOnOff request
+		var request = require("request");
+		var options = {
+			method: 'GET',
+			url: 'http://192.168.1.98:9876/send',
+			qs: {
+				deviceMac: 'b4:43:0d:b0:8a:2b',
+				on: true
+			}
+		};
+
+		request(options, function(error, response, body) {
+			if (error) throw new Error(error);
+
+			console.log(body);
+		});
+	}
+};
+
+
+var puts = function (error, stdout, stderr) {
 	// sys.puts(stdout);
 	// console.log(stdout.substring(0, 50));
 	console.log(stdout);
@@ -19,44 +54,18 @@ function puts(error, stdout, stderr) {
 
 	var req;
 
+	
+
 
 	if (isDellOn) {
 		console.log(msg);
 		//get status on|off
 		
-		var turnOnOff = false;
-
-		var timestamp = new Date().getTime() / 1000;
-
-		var hours = Math.floor(timestamp / 60 / 60);
-
-		var offset = +7;
-
-		var hourInDay = hours % 24 + offset;
-
-		if(hourInDay > 13 & hourInDay < 18){
-			turnOnOff = true;
-		}
-
-		if(turnOnOff){
-			//send turnOnOff request
-			var request = require("request");
-			var options = {
-				method: 'GET',
-				url: 'http://192.168.1.98:9876/send',
-				qs: {
-					deviceMac: 'b4:43:0d:b0:8a:2b',
-					on: true
-				}
-			};
-
-			request(options, function(error, response, body) {
-				if (error) throw new Error(error);
-
-				console.log(body);
-			});
-		}
+		var rule = {
+			timeRange: [13, 18]
+		};
 		
+		requestTurnOn(rule);
 	}
 
 }
