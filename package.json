@@ -1,0 +1,19 @@
+{
+  "name": "turn-light-on",
+  "version": "1.0.0",
+  "description": "detect user in room, turn light on",
+  "main": "check-mac-address.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "turn",
+    "light",
+    "on"
+  ],
+  "author": "Anh Le Hoang",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.74.0"
+  }
+}
