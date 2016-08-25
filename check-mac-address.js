@@ -1,5 +1,12 @@
 //in linux, - replace by :
-var dellMacAdd = 'e0:9d:31:2a:fd:a0';
+// var dellMacAdd = 'e0:9d:31:2a:fd:a0';
+// var dellMacAdd = 'd8-fe-e3-67-e1-3c';
+var operatingSys = process.platform;
+
+var isWin = operatingSys == 'win32';
+
+//on windwos "arp -a" command detect isDellOn by ip 192.168.1.65
+var dellMacAdd =  isWin ? '192.168.1.65' : 'e0:9d:31:2a:fd:a0';
 
 //exec cmd from node
 var exec = require('child_process').exec;
@@ -19,24 +26,30 @@ var requestTurnOn = function(rule){
 		turnOnOff = true;
 	}
 
-	if(turnOnOff){
-		//send turnOnOff request
-		var request = require("request");
-		var options = {
+	var request = require("request");
+
+	var options = {
 			method: 'GET',
 			url: 'http://192.168.1.98:9876/send',
 			qs: {
-				deviceMac: 'b4:43:0d:b0:8a:2b',
-				on: true
+				deviceMac: 'b4:43:0d:b0:8a:2b'
 			}
 		};
 
-		request(options, function(error, response, body) {
-			if (error) throw new Error(error);
-
-			console.log(body);
-		});
+	if(turnOnOff){
+		//send turnOnOff request
+		options.qs.on = true;
 	}
+
+	if(!turnOnOff){
+		options.qs.off = true;
+	}
+
+	request(options, function(error, response, body) {
+		if (error) throw new Error(error);
+
+		console.log(body);
+	});
 };
 
 
@@ -48,7 +61,6 @@ var puts = function (error, stdout, stderr) {
 	var msg = isDellOn ? 'dellMacAdd is on' : 'can not find dellMacAdd';
 
 	if (isDellOn) {
-		console.log(msg);
 		//get status on|off
 		
 		var rule = {
@@ -56,10 +68,15 @@ var puts = function (error, stdout, stderr) {
 		};
 		
 		requestTurnOn(rule);
+		// return;
 	}
 
+	console.log(msg);
 }
+//exec 1 time
+exec("arp -a", puts);
 
+//then interval check every 5m
 var intervalCheck = setInterval(function(){
 	exec("arp -a", puts);
 }, 5 * 60 * 1000);
